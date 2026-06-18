@@ -1,0 +1,31 @@
+services:
+  ollama:
+    image: ollama/ollama
+    container_name: ollama_rag
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_rag:/root/.ollama
+
+  # Vector DB builder (建資料庫)
+  builder:
+    build: .
+    container_name: d4_builder
+    command: python build_vector_db.py
+    volumes:
+      - ./chroma_db:/app/chroma_db
+
+  # Chatbot service (聊天服務)
+  chat:
+    build: .
+    container_name: d4_chatbot
+    command: python chatbot.py
+    volumes:
+      - ./chroma_db:/app/chroma_db
+    depends_on:
+      - ollama
+      - builder
+
+# Persistent storage (資料保存)
+volumes:
+  ollama_rag:
