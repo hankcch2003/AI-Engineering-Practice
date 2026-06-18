@@ -1,0 +1,22 @@
+services:
+  # Ollama service (模型服務)
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
+  # Application service (應用程式)
+  app:
+    build: .
+    container_name: ollama_app
+    depends_on:
+      - ollama
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+
+# Persistent storage (資料保存)
+volumes:
+  ollama_data:
